@@ -1,6 +1,6 @@
 $(function(){
     $("#sizeInput").focusout(function(){
-        if($.isNumeric($("#sizeInput").val()) || $("#sizeInput").val() > 0){
+        if($.isNumeric($("#sizeInput").val()) && $("#sizeInput").val() > 0 && $("#sizeInput").val() < 102){
             generateGraph($("#sizeInput").val());
         }
         else 
