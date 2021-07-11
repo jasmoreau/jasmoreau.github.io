@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content = "width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="style.css"/>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+</head>
+<body>
+    <div left="0" right="0" padding="0">
+    <br/>
+    <div id="container">
+        <canvas id="graph" width="800" height="800" style="border:1px solid #000000;"></canvas>
+    </div>
+
+    </div>
+    <div class = "righthand">
+        <p class="header">A* Algo</p>
+        <form id= "form" action="/" method="GET">
+            <div>
+                <label for="size">Size: </label>
+                <input id="sizeInput" name="sizeInput" type="someid">
+            </div>
+        </form>
+        <button onclick="executeAlgo()">Execute Algorithm</button>
+        <p id="currSize"></p>
+    </div>
+
+</body>
+<script src="script.js"></script>
+
+</html>
