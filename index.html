@@ -16,11 +16,11 @@
 
     </div>
     <div class = "righthand">
-        <p class="header">A* Algo</p>
+        <p class="header">Dijkstra</p>
         <form id= "form" action="/" method="GET">
             <div>
                 <label for="size">Size: </label>
-                <input id="sizeInput" name="sizeInput" type="someid">
+                <input id="sizeInput" name="sizeInput" type="someid" onkeydown="if (event.keyCode == 13) { checkText();return false;}">
             </div>
         </form>
         <button onclick="executeAlgo()">Execute Algorithm</button>

@@ -1,4 +1,16 @@
 $(function(){
+    $("#sizeInput").keypress(function(e){
+      if(e.keyCode == 13){
+        e.preventDefault();
+      if($.isNumeric($("#sizeInput").val()) && $("#sizeInput").val() > 0 && $("#sizeInput").val() < 102){
+          
+          generateGraph($("#sizeInput").val());
+      }
+    }
+      else 
+          return;
+    });
+
     $("#sizeInput").focusout(function(){
         if($.isNumeric($("#sizeInput").val()) && $("#sizeInput").val() > 0 && $("#sizeInput").val() < 102){
             generateGraph($("#sizeInput").val());
@@ -8,9 +20,9 @@ $(function(){
     });
 });
 
-
 let canvas = document.getElementById("graph");
 let context = canvas.getContext("2d");
+let t;
 
 var matrix;
 var size;
@@ -25,10 +37,10 @@ function generateGraph(size = Math.ceil(Math.random()*20)+10){
         $("#currSize").text(size);
     });
     
-    console.log(size);
+    //console.log(size);
     var cellWidth = 800/size;
     var cellHeight = 800/size;
-    console.log(cellWidth);
+    //console.log(cellWidth);
 
     matrix = new Array();
     for(var i=0; i<size; i++){
@@ -57,7 +69,7 @@ function generateGraph(size = Math.ceil(Math.random()*20)+10){
 
             context.fillStyle = "green";
             context.font = cellWidth/2 + "px Arial";
-            context.fillText("Test", i*cellWidth, j*cellHeight+(cellHeight/1.5));
+            //context.fillText("Test", i*cellWidth, j*cellHeight+(cellHeight/1.5));
         }
     }
     context.fillStyle = "red";
@@ -65,11 +77,7 @@ function generateGraph(size = Math.ceil(Math.random()*20)+10){
     context.fillRect(cellWidth*(size-2), cellWidth*(size-2), cellWidth, cellHeight);
 
     context.fillStyle = "black";
-    for(var i=0; i<size; i++){
-        for(var j=0; j<size; j++){
-            
-        }
-    }
+
 
     
 }
@@ -143,12 +151,15 @@ function execDijk(src1, src2, dest1, dest2) {
     var tot = matrix.length*matrix[0]*length;
     var dist = new Array(matrix.length);
     var visited = new Array(matrix.length);
+    var parent = new Array(matrix.length);
     for(var i=0; i<matrix.length; i++){
         dist[i] = new Array();
         visited[i] = new Array();
+        parent[i] = new Array();
         for(var j=0; j<matrix[0].length; j++){
             dist[i][j] = Number.MAX_SAFE_INTEGER;
             visited[i][j] = false;
+            parent[i][j] = new point(0,0,0);
         }
     }   
     var queue = new PriorityQueue();
@@ -156,32 +167,92 @@ function execDijk(src1, src2, dest1, dest2) {
     queue.push(p);
     dist[src1][src2] = 0;
     visited[src1][src2] = true;
+    parent[src1][src2] = -1;
     const diffX = [0,0,1,-1];
     const diffY = [-1,1,0,0];
-
+    var queue1 = [];
+    t = 0;
+    var x, y;
     while(queue.size() > 0){
         var u = queue.pop();
-        var x = u.x;
-        var y = u.y;
+        x = u.x;
+        y = u.y;
         var d = u.dist;
 
         visited[x][y] = true;
 
-        console.log(size)
-        context.fillRect(x*800/size, y*800/size, 800/size, 800/size);
+        //console.log(size)
+        //context.fillRect(x*800/size, y*800/size, 800/size, 800/size);
 
         for(var i=0; i<4; i++){
             var neighRow = x + diffY[i];
             var neighCol = y + diffX[i];
             //console.log(visited[neighRow][neighCol]);
             if(neighCol >= 0 && neighRow >= 0 && matrix[neighRow][neighCol] == 0 && visited[neighRow][neighCol] == false){
-                console.log("here");
+                //console.log("here");
                 dist[neighRow][neighCol] += 1;
-                var t = new point(neighRow, neighCol, dist[neighRow][neighCol]);
-                queue.push(t);
+                parent[neighRow][neighCol] = u;
+                var z = new point(neighRow, neighCol, dist[neighRow][neighCol]);
+                queue.push(z);
             }
         }
+        queue1.push(u);
+        t++;
     }
+    let explore = setInterval(() => {
+      u = queue1.shift();
+      context.fillRect((u.x)*800/size, (u.y)*800/size, 800/size, 800/size);
+      if(queue1.length == 0) clearInterval(explore);
+    }, 20);
+    setTimeout(() => {
+      resetGrid();
+      printPath(parent, dest1, dest2, src1, src2); 
+    }, t*21);
+    
+}
+
+function printPath(parent, x, y, src1, src2){
+  var stack = [];
+  var u = new point(x, y, 0);
+  stack.push(u);
+  while(u.x != src1 || u.y != src2){
+    var nextNode = new point(parent[u.x][u.y].x, parent[u.x][u.y].y, 0);
+    //console.log(nextNode.x);
+    stack.push(nextNode);
+    u = nextNode;
+  }
+  context.fillStyle = "red";
+  let draw = setInterval(() => {
+    u = stack.pop();
+    context.fillRect((u.x)*800/size, (u.y)*800/size, 800/size, 800/size);
+    if(stack.length == 0) clearInterval(draw);
+  }, 20); 
+}
+
+function resetGrid() {
+  var cellWidth = 800/size;
+  var cellHeight = 800/size;
+  for(var i=0; i<size; i++){
+    for(var j=0; j<size; j++){
+        context.fillStyle = (matrix[i][j] == 1) ? "#000000" : "#FFFFFF";
+        context.fillRect(i*cellWidth,j*cellHeight, cellWidth, cellHeight);
+
+        context.fillStyle = "#000000";
+        context.fillRect(i*cellWidth,j*cellHeight, 1, cellHeight);
+        context.fillRect(i*cellWidth,j*cellHeight, cellWidth, 1);
+        context.fillRect((i+1)*cellWidth-1,j*cellHeight-1, 1, cellHeight);
+        context.fillRect(i*cellWidth,(j+1)*cellHeight, cellWidth, 1);
+
+        context.fillStyle = "green";
+        context.font = cellWidth/2 + "px Arial";
+        //context.fillText("Test", i*cellWidth, j*cellHeight+(cellHeight/1.5));
+    }
+}
+context.fillStyle = "red";
+context.fillRect(cellWidth, cellHeight, cellWidth, cellHeight);
+context.fillRect(cellWidth*(size-2), cellWidth*(size-2), cellWidth, cellHeight);
+
+context.fillStyle = "black";
 }
 
 function executeAlgo() {
