@@ -2,15 +2,18 @@
 body {
     position:center;
     margin: 0;
-    display: inline-flex;
+    display: flex;
     padding-left: 150px;
     top: 0;
+    width: 90%;
+    height: 90%;
 }
 
 .header {
     left: 0;
     right: 0;
-    font-size: 100px;
+    margin-left: 0;
+    font-size: 4vw;
     text-align: center;
     position:center;
 }
@@ -29,5 +32,16 @@ body {
 }
 
 .righthand {
-    margin-left: 100px;
+    margin-left: 2vw;
+    width: 25%;
+    height: 25%;
+}
+
+.inside {
+    position: center;
+    text-align: center;
+}
+
+#button1 {
+    margin-left: 30%;
 }

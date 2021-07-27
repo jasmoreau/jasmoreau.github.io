@@ -1,3 +1,4 @@
+//size input box
 $(function(){
     $("#sizeInput").keypress(function(e){
       if(e.keyCode == 13){
@@ -20,14 +21,22 @@ $(function(){
     });
 });
 
+
+//variables needed for calculations
 let canvas = document.getElementById("graph");
 let context = canvas.getContext("2d");
 let t;
+
+var canvSize = Math.min($(window).height(), $(window).width())/1.6;
+context.canvas.width = canvSize;
+context.canvas.height = canvSize;
 
 var matrix;
 var size;
 const random = (min, max) => Math.floor(Math.random() * (max - min+1)) + min;
 
+
+//generate solvable matrix based on size
 function generateGraph(size = Math.ceil(Math.random()*20)+10){
 
     size = parseInt(size);
@@ -38,8 +47,8 @@ function generateGraph(size = Math.ceil(Math.random()*20)+10){
     });
     
     //console.log(size);
-    var cellWidth = 800/size;
-    var cellHeight = 800/size;
+    var cellWidth = canvSize/size;
+    var cellHeight = canvSize/size;
     //console.log(cellWidth);
 
     matrix = new Array();
@@ -53,10 +62,10 @@ function generateGraph(size = Math.ceil(Math.random()*20)+10){
     }
 
     
-    innerWalls(1, size-2, 1, size-2, true);
-    outerWalls(size);
+    innerWalls(1, size-2, 1, size-2, true); //marks interior walls as 1
+    outerWalls(size); //exterior walls are 1
 
-    for(var i=0; i<size; i++){
+    for(var i=0; i<size; i++){ //drawing walls
         for(var j=0; j<size; j++){
             context.fillStyle = (matrix[i][j] == 1) ? "#000000" : "#FFFFFF";
             context.fillRect(i*cellWidth,j*cellHeight, cellWidth, cellHeight);
@@ -82,6 +91,7 @@ function generateGraph(size = Math.ceil(Math.random()*20)+10){
     
 }
 
+//generateGraph helper
 function outerWalls(size){
     for(var i = 0; i < size; i++){
         if(i == 0 || i == size - 1){
@@ -94,6 +104,7 @@ function outerWalls(size){
     }
 }
 
+//generateGraph helper
 function innerWalls(minX, maxX, minY, maxY, state) {
     if (state) {
 
@@ -119,6 +130,7 @@ function innerWalls(minX, maxX, minY, maxY, state) {
     }
 }
 
+//generateGraph helper
 function hWall(minX, maxX, y){
     var passage = Math.floor(random(minX,maxX)/2)*2+1;
     for(var i = minX; i <= maxX; i++){
@@ -127,6 +139,7 @@ function hWall(minX, maxX, y){
     }
 }
 
+//generateGraph helper
 function vWall(minY, maxY, x){
     var passage = Math.floor(random(minY,maxY)/2)*2+1;
     for(var i = minY; i <= maxY; i++){
@@ -135,6 +148,7 @@ function vWall(minY, maxY, x){
     }
 }
 
+//class for prioQueue elements
 class point {
     constructor(x, y, dist){
         this.x = x;
@@ -143,6 +157,7 @@ class point {
     }
 }
 
+//dijkstra algorithm displayed on current matrix
 function execDijk(src1, src2, dest1, dest2) {
     size = $("#currSize").text();
 
@@ -199,18 +214,19 @@ function execDijk(src1, src2, dest1, dest2) {
         queue1.push(u);
         t++;
     }
-    let explore = setInterval(() => {
+    let explore = setInterval(() => { //draws how dijkstra finds paths
       u = queue1.shift();
-      context.fillRect((u.x)*800/size, (u.y)*800/size, 800/size, 800/size);
+      context.fillRect((u.x)*canvSize/size, (u.y)*canvSize/size, canvSize/size, canvSize/size);
       if(queue1.length == 0) clearInterval(explore);
     }, 20);
-    setTimeout(() => {
+    setTimeout(() => { 
       resetGrid();
-      printPath(parent, dest1, dest2, src1, src2); 
+      printPath(parent, dest1, dest2, src1, src2); //draw optimal path
     }, t*21);
     
 }
 
+//draw path from dijkstra result
 function printPath(parent, x, y, src1, src2){
   var stack = [];
   var u = new point(x, y, 0);
@@ -224,14 +240,15 @@ function printPath(parent, x, y, src1, src2){
   context.fillStyle = "red";
   let draw = setInterval(() => {
     u = stack.pop();
-    context.fillRect((u.x)*800/size, (u.y)*800/size, 800/size, 800/size);
+    context.fillRect((u.x)*canvSize/size, (u.y)*canvSize/size, canvSize/size, canvSize/size);
     if(stack.length == 0) clearInterval(draw);
   }, 20); 
 }
 
+//empty grid for redraw
 function resetGrid() {
-  var cellWidth = 800/size;
-  var cellHeight = 800/size;
+  var cellWidth = canvSize/size;
+  var cellHeight = canvSize/size;
   for(var i=0; i<size; i++){
     for(var j=0; j<size; j++){
         context.fillStyle = (matrix[i][j] == 1) ? "#000000" : "#FFFFFF";
@@ -274,7 +291,7 @@ generateGraph();
 
 
 
-//helper functions 
+//helper classes/functions 
 
 
 const topp = 0;

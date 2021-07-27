@@ -17,14 +17,15 @@
     </div>
     <div class = "righthand">
         <p class="header">Dijkstra</p>
-        <form id= "form" action="/" method="GET">
+        <form class="inside"  id= "form" action="/" method="GET">
             <div>
-                <label for="size">Size: </label>
-                <input id="sizeInput" name="sizeInput" type="someid" onkeydown="if (event.keyCode == 13) { checkText();return false;}">
+                <label class="inside" for="size">Size: </label>
+                <input class="inside" id="sizeInput" name="sizeInput" type="someid" onkeydown="if (event.keyCode == 13) { checkText();return false;}">
             </div>
         </form>
-        <button onclick="executeAlgo()">Execute Algorithm</button>
-        <p id="currSize"></p>
+        <button class="inside" id="button1" onclick="executeAlgo()">Execute Algorithm</button>
+        <p class="inside">Current size:</p>
+        <p class="inside" id="currSize"></p>
     </div>
 
 </body>
