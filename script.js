@@ -27,7 +27,7 @@ let canvas = document.getElementById("graph");
 let context = canvas.getContext("2d");
 let t;
 
-var canvSize = Math.min($(window).height(), $(window).width())/1.6;
+var canvSize = Math.min($(window).height(), $(window).width())/1.3;
 context.canvas.width = canvSize;
 context.canvas.height = canvSize;
 

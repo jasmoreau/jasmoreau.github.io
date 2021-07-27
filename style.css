@@ -40,8 +40,9 @@ body {
 .inside {
     position: center;
     text-align: center;
+    font-size: 2vw;
 }
 
 #button1 {
-    margin-left: 30%;
+    position: center;
 }
