@@ -5,33 +5,38 @@
 <meta http-equiv="Pragma" content="no-cache"/>
 <meta http-equiv="Expires" content="0"/>
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content = "width=device-width, initial-scale=1.0"/>
     <link rel="stylesheet" href="style.css"/>
     <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
 </head>
 <body>
-    <div left="0" right="0" padding="0">
-    <br/>
-    <div id="container">
-        <canvas id="graph" width="800" height="800" style="border:1px solid #000000;"></canvas>
-    </div>
-
-    </div>
-    <div class = "righthand">
-        <p class="header">Dijkstra</p>
-        <form class="inside"  id= "form" action="/" method="GET">
-            <div>
-                <label class="inside" for="size">Size: </label>
-                <input class="inside" id="sizeInput" name="sizeInput" type="someid" onkeydown="if (event.keyCode == 13) { checkText();return false;}">
+    <div class = "container">
+        <div class = "form-group row">
+            <canvas class="col-sm-8 col-md-8" id="graph"></canvas>
+            <div class="col-sm-4 col-md-4">
+                <h4 class = "header" text-align = "center">Dijkstra</h4>
+                <form class="inside"  id="form" action="/" method="GET">
+                    <div>
+                        <label class="inside" for="size">Size: </label>
+                        <input class="inside form-control" id="sizeInput" name="sizeInput" type="someid" onkeydown="if (event.keyCode == 13) {checkText();return false;}">
+                    </div>
+                </form>
+                <br/>
+                <button  id="button1" class="btn btn-secondary" onclick="executeAlgo()">Execute Algorithm</button>
+                <p class="inside">Current size: <span id="currSize"></span></p>
+                <input id="timeInterval" type="range" min="0" max="100" onChange="updateTimeInterval(this.value);">
+                <span>Time interval: <span id="timeIntervalVal"></span>ms</span>
             </div>
-        </form>
-        <button  id="button1" onclick="executeAlgo()">Execute Algorithm</button>
-        <p class="inside">Current size:</p>
-        <p class="inside" id="currSize"></p>
+        </div>
     </div>
+    
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
 </body>
 <script src="script.js"></script>
 

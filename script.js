@@ -20,6 +20,11 @@ $(function(){
     });
 });
 
+function checkText(){
+  if($.isNumeric($("#sizeInput").val()) && $("#sizeInput").val() > 0 && $("#sizeInput").val() < 102){
+    generateGraph($("#sizeInput").val());
+  }
+}
 
 //variables needed for calculations
 let canvas = document.getElementById("graph");
@@ -35,20 +40,35 @@ var size;
 var currTimeout;
 var explore;
 var draw;
+var exploreSpeed;
 const random = (min, max) => Math.floor(Math.random() * (max - min+1)) + min;
+
+function updateTimeInterval(val) {
+  document.getElementById('timeIntervalVal').innerText = val;
+}
+
+const range = document.getElementById('timeInterval');
+const rangeVal = document.getElementById('timeIntervalVal');
+setValue = ()=>{
+  rangeVal.innerText = range.value;
+  exploreSpeed = range.value;
+};
+document.addEventListener("DOMContentLoaded", setValue);
+range.addEventListener('input', setValue);
 
 
 //generate solvable matrix based on size
 function generateGraph(size = Math.ceil(Math.random()*20)+10){ 
     clearTimeout(currTimeout);
-    clearInterval(explore);
-    clearInterval(draw);
+    clearTimeout(explore);
+    clearTimeout(draw);
 
     size = parseInt(size);
     if(size % 2 == 0) size += 1;
 
     $(function(){
         $("#currSize").text(size);
+        $("#sizeInput").attr("placeholder", size);
     });
     
     //console.log(size);
@@ -166,7 +186,6 @@ class point {
 function execDijk(src1, src2, dest1, dest2) {
     size = $("#currSize").text();
 
-
     context.fillStyle = "red";
     var tot = matrix.length*matrix[0]*length;
     var dist = new Array(matrix.length);
@@ -182,7 +201,7 @@ function execDijk(src1, src2, dest1, dest2) {
             parent[i][j] = new point(0,0,0);
         }
     }   
-    
+
     var queue = new PriorityQueue();
     var p = new point(src1, src2, 0);
     queue.push(p);
@@ -219,15 +238,21 @@ function execDijk(src1, src2, dest1, dest2) {
         t++;
     }
 
-    explore = setInterval(() => { //draws how dijkstra finds paths
+    function exploreLoop() { //draws how dijkstra finds paths
       u = queue1.shift();
       context.fillRect((u.x)*canvSize/size, (u.y)*canvSize/size, canvSize/size, canvSize/size);
-      if(queue1.length == 0) clearInterval(explore);
-    }, 20);
-    currTimeout = setTimeout(() => { 
-      resetGrid();
-      printPath(parent, dest1, dest2, src1, src2); //draw optimal path
-    }, t*21);
+      if(queue1.length != 0) explore = setTimeout(exploreLoop, exploreSpeed);
+    }
+    exploreLoop();
+
+    function checkExplored() {
+      if(queue1.length != 0) currTimeout = setTimeout(checkExplored, exploreSpeed);
+      else{
+        resetGrid();
+        printPath(parent, dest1, dest2, src1, src2); //draw optimal path
+      }
+    }
+    checkExplored();
     
 }
 
@@ -243,19 +268,21 @@ function printPath(parent, x, y, src1, src2){
     u = nextNode;
   }
   context.fillStyle = "red";
-  draw = setInterval(() => {
+
+  function exploreLoop() { //draws how dijkstra finds paths
     u = stack.pop();
     context.fillRect((u.x)*canvSize/size, (u.y)*canvSize/size, canvSize/size, canvSize/size);
-    if(stack.length == 0) clearInterval(draw);
-  }, 20); 
+    if(stack.length != 0) draw = setTimeout(exploreLoop, exploreSpeed);
+  }
+  exploreLoop();
 }
 
 //empty grid for redraw
 function resetGrid() {
-  var cellWidth = canvSize/size;
-  var cellHeight = canvSize/size;
-  for(var i=0; i<size; i++){
-    for(var j=0; j<size; j++){
+  var cellWidth = canvSize/matrix.length;
+  var cellHeight = canvSize/matrix.length;
+  for(var i=0; i<matrix.length; i++){
+    for(var j=0; j<matrix.length; j++){
         context.fillStyle = (matrix[i][j] == 1) ? "#000000" : "#FFFFFF";
         context.fillRect(i*cellWidth,j*cellHeight, cellWidth, cellHeight);
 
@@ -264,21 +291,21 @@ function resetGrid() {
         context.fillRect(i*cellWidth,j*cellHeight, cellWidth, 1);
         context.fillRect((i+1)*cellWidth-1,j*cellHeight-1, 1, cellHeight);
         context.fillRect(i*cellWidth,(j+1)*cellHeight, cellWidth, 1);
-
-        context.fillStyle = "green";
-        context.font = cellWidth/2 + "px Arial";
-        //context.fillText("Test", i*cellWidth, j*cellHeight+(cellHeight/1.5));
     }
 }
 context.fillStyle = "red";
 context.fillRect(cellWidth, cellHeight, cellWidth, cellHeight);
-context.fillRect(cellWidth*(size-2), cellWidth*(size-2), cellWidth, cellHeight);
+context.fillRect(cellWidth*(matrix.length-2), cellWidth*(matrix.length-2), cellWidth, cellHeight);
 
 context.fillStyle = "black";
 }
 
 function executeAlgo() {
-    execDijk(1, 1, matrix.length-2, matrix.length-2);
+  clearTimeout(currTimeout);
+  clearTimeout(explore);
+  clearTimeout(draw);
+  resetGrid();
+  execDijk(1, 1, matrix.length-2, matrix.length-2);
 }
 
 generateGraph();
