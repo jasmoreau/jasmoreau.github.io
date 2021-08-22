@@ -4,8 +4,7 @@ $(function(){
       if(e.keyCode == 13){
         e.preventDefault();
       if($.isNumeric($("#sizeInput").val()) && $("#sizeInput").val() > 0 && $("#sizeInput").val() < 102){
-          
-          generateGraph($("#sizeInput").val());
+        generateGraph($("#sizeInput").val());
       }
     }
       else 
@@ -14,7 +13,7 @@ $(function(){
 
     $("#sizeInput").focusout(function(){
         if($.isNumeric($("#sizeInput").val()) && $("#sizeInput").val() > 0 && $("#sizeInput").val() < 102){
-            generateGraph($("#sizeInput").val());
+          generateGraph($("#sizeInput").val());
         }
         else 
             return;
@@ -33,11 +32,17 @@ context.canvas.height = canvSize;
 
 var matrix;
 var size;
+var currTimeout;
+var explore;
+var draw;
 const random = (min, max) => Math.floor(Math.random() * (max - min+1)) + min;
 
 
 //generate solvable matrix based on size
-function generateGraph(size = Math.ceil(Math.random()*20)+10){
+function generateGraph(size = Math.ceil(Math.random()*20)+10){ 
+    clearTimeout(currTimeout);
+    clearInterval(explore);
+    clearInterval(draw);
 
     size = parseInt(size);
     if(size % 2 == 0) size += 1;
@@ -177,6 +182,7 @@ function execDijk(src1, src2, dest1, dest2) {
             parent[i][j] = new point(0,0,0);
         }
     }   
+    
     var queue = new PriorityQueue();
     var p = new point(src1, src2, 0);
     queue.push(p);
@@ -188,6 +194,7 @@ function execDijk(src1, src2, dest1, dest2) {
     var queue1 = [];
     t = 0;
     var x, y;
+
     while(queue.size() > 0){
         var u = queue.pop();
         x = u.x;
@@ -195,9 +202,6 @@ function execDijk(src1, src2, dest1, dest2) {
         var d = u.dist;
 
         visited[x][y] = true;
-
-        //console.log(size)
-        //context.fillRect(x*800/size, y*800/size, 800/size, 800/size);
 
         for(var i=0; i<4; i++){
             var neighRow = x + diffY[i];
@@ -214,12 +218,13 @@ function execDijk(src1, src2, dest1, dest2) {
         queue1.push(u);
         t++;
     }
-    let explore = setInterval(() => { //draws how dijkstra finds paths
+
+    explore = setInterval(() => { //draws how dijkstra finds paths
       u = queue1.shift();
       context.fillRect((u.x)*canvSize/size, (u.y)*canvSize/size, canvSize/size, canvSize/size);
       if(queue1.length == 0) clearInterval(explore);
     }, 20);
-    setTimeout(() => { 
+    currTimeout = setTimeout(() => { 
       resetGrid();
       printPath(parent, dest1, dest2, src1, src2); //draw optimal path
     }, t*21);
@@ -238,7 +243,7 @@ function printPath(parent, x, y, src1, src2){
     u = nextNode;
   }
   context.fillStyle = "red";
-  let draw = setInterval(() => {
+  draw = setInterval(() => {
     u = stack.pop();
     context.fillRect((u.x)*canvSize/size, (u.y)*canvSize/size, canvSize/size, canvSize/size);
     if(stack.length == 0) clearInterval(draw);
