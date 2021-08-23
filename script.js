@@ -68,7 +68,7 @@ function generateGraph(size = Math.ceil(Math.random()*20)+10){
 
     $(function(){
         $("#currSize").text(size);
-        $("#sizeInput").attr("placeholder", size);
+        $("#sizeInput").attr("placeholder", size + " (Odd number 1-101)");
     });
     
     //console.log(size);
@@ -202,33 +202,35 @@ function execDijk(src1, src2, dest1, dest2) {
         }
     }   
 
-    var queue = new PriorityQueue();
+    var queue = [];
     var p = new point(src1, src2, 0);
     queue.push(p);
     dist[src1][src2] = 0;
     visited[src1][src2] = true;
     parent[src1][src2] = -1;
-    const diffX = [0,0,1,-1];
-    const diffY = [-1,1,0,0];
+    const diffX = [-1,0,0,1];
+    const diffY = [0,-1,1,0];
     var queue1 = [];
     t = 0;
     var x, y;
 
-    while(queue.size() > 0){
-        var u = queue.pop();
+    while(queue.length > 0){
+        var u = queue.shift();
         x = u.x;
         y = u.y;
         var d = u.dist;
 
-        visited[x][y] = true;
-
         for(var i=0; i<4; i++){
-            var neighRow = x + diffY[i];
-            var neighCol = y + diffX[i];
+            var neighRow = x + diffX[i];
+            var neighCol = y + diffY[i];
             //console.log(visited[neighRow][neighCol]);
-            if(neighCol >= 0 && neighRow >= 0 && matrix[neighRow][neighCol] == 0 && visited[neighRow][neighCol] == false){
+            if(neighCol > 0 && neighRow > 0 && neighCol < matrix.length && neighRow < matrix[0].length && matrix[neighRow][neighCol] == 0 && !visited[neighRow][neighCol]){
                 //console.log("here");
+                visited[neighRow][neighCol] = true;
                 dist[neighRow][neighCol] += 1;
+                if(dist[parent[neighRow][neighCol].x][parent[neighRow][neighCol]] > dist[neighRow][neighCol]){
+                  parent[neighRow][neighCol] = u;
+                }
                 parent[neighRow][neighCol] = u;
                 var z = new point(neighRow, neighCol, dist[neighRow][neighCol]);
                 queue.push(z);
